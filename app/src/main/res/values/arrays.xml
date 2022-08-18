@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="preference.timer_melody.labels">
+        <item>Bell №1</item>
+        <item>Bell №2</item>
+        <item>Bell №3</item>
+    </string-array>
+
+    <string-array name="preference.timer_melody.values">
+        <item>bell</item>
+        <item>bell2</item>
+        <item>bell3</item>
+    </string-array>
+
+</resources>

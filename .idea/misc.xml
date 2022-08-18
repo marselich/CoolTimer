@@ -3,7 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/androidProjects/projects/CoolTimer/app/src/main/res/drawable/drawable_panel_menu.xml" value="0.1825" />
         <entry key="..\:/androidProjects/projects/CoolTimer/app/src/main/res/layout/activity_main.xml" value="0.32608695652173914" />
+        <entry key="..\:/androidProjects/projects/CoolTimer/app/src/main/res/layout/activity_settings.xml" value="0.35520833333333335" />
+        <entry key="..\:/androidProjects/projects/CoolTimer/app/src/main/res/menu/timer_menu.xml" value="0.33" />
+        <entry key="..\:/androidProjects/projects/CoolTimer/app/src/main/res/xml/timer_preferences.xml" value="0.33" />
       </map>
     </option>
   </component>

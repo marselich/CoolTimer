@@ -1,24 +1,30 @@
 package ru.kalievmars.cooltimer;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 
-import android.media.AudioManager;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     Time time;
     TextView textViewTimer;
     Button buttonStart;
     SeekBar seekBar;
     CountDownTimer timer;
-    MediaPlayer mediaPlayer;
+    SharedPreferences sharedPreferences;
 
     boolean isStart;
 
@@ -30,13 +36,17 @@ public class MainActivity extends AppCompatActivity {
         textViewTimer = findViewById(R.id.textView_timer);
         buttonStart = findViewById(R.id.button_start);
         buttonStart.setOnClickListener(startTimerOnClickListener);
-        mediaPlayer = MediaPlayer.create(this, R.raw.bell_sample);
+
         time = new Time(0, 0);
         isStart = true;
         seekBar.setMax(600);
-        seekBar.setProgress(30);
+
         seekBar.setOnSeekBarChangeListener(SeekBarChangeListener);
         setTextTime(seekBar.getProgress());
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        setDefaultInterval(sharedPreferences);
 
 //        Handler handler = new Handler();
 //
@@ -50,8 +60,15 @@ public class MainActivity extends AppCompatActivity {
 //        };
 //
 //        handler.post(runnable);
+
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+    }
 
     View.OnClickListener startTimerOnClickListener = new View.OnClickListener() {
         @Override
@@ -98,8 +115,21 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
-                if(time.getSeconds() == 0) {
-                    mediaPlayer.start();
+                if(sharedPreferences.getBoolean("enable_sound", true)) {
+                    if(time.getSeconds() == 0) {
+                        String tempSharedPref = sharedPreferences.getString("timer_melody", "bell");
+                        if(tempSharedPref.equals("bell")) {
+                            MediaPlayer mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bell);
+                            mediaPlayer.start();
+                        } else if(tempSharedPref.equals("bell2")) {
+                            MediaPlayer mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bell2);
+                            mediaPlayer.start();
+                        } else if(tempSharedPref.equals("bell3")) {
+                            MediaPlayer mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.bell3);
+                            mediaPlayer.start();
+                        }
+
+                    }
                 }
                 setTextTime(seekBar.getProgress());
                 turnOnStartTimer();
@@ -125,4 +155,43 @@ public class MainActivity extends AppCompatActivity {
         isStart = true;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.timer_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                break;
+            case R.id.action_about:
+                Intent aboutIntent = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(aboutIntent);
+                break;
+        }
+        return true;
+    }
+
+    private void setDefaultInterval(SharedPreferences sharedPreferences) {
+        try {
+            String value = sharedPreferences.getString("default_interval", "30");
+            setTextTime(Integer.parseInt(value));
+            seekBar.setProgress(Integer.parseInt(value));
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(key.equals("default_interval")) {
+            setDefaultInterval(sharedPreferences);
+        }
+    }
 }
